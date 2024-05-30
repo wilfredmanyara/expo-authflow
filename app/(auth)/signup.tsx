@@ -1,21 +1,38 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { useAuth } from "../context/AuthProvider";
 import { Link } from "expo-router";
+import Toast from "react-native-root-toast";
+
 
 export default function Signup() {
-  const { signup } = useAuth();
+  const { signup, loading } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignup = () => {
-    // Perform validation if necessary
-    signup(email, password);
+  const handleSignup = async () => {
+    try {
+      await signup(name, email, password);
+      Toast.show("Signup successful!", {
+        duration: Toast.durations.LONG,
+      });
+    } catch (error) {
+      Toast.show("Signup failed. Please try again.", {
+        duration: Toast.durations.LONG,
+      });
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        onChangeText={setName}
+        value={name}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -29,13 +46,20 @@ export default function Signup() {
         value={password}
         secureTextEntry
       />
-      <Pressable style={styles.button} onPress={handleSignup}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </Pressable>
-      <Text style={styles.linkText}>
+      {loading ? (
+        <ActivityIndicator size="small" color="#0000ff" style={styles.loader} />
+      ) : (
+        <>
+        <Pressable style={styles.button} onPress={handleSignup}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
+        <Text style={styles.linkText}>
         Already have an account?{" "}
         <Link style={styles.link} href={"/login"}>Log in</Link>
       </Text>
+      </>
+      )}
+      
     </View>
   );
 }
@@ -45,6 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: 16,
   },
   title: {
     fontSize: 24,
@@ -70,6 +95,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     textAlign: "center",
+  },
+  loader: {
+    marginVertical: 20,
   },
   linkText: {
     marginTop: 20,

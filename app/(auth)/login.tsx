@@ -1,15 +1,31 @@
-import React from "react";
-import { View, Text, Pressable, TextInput, Button, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Pressable, TextInput, Button, StyleSheet, ActivityIndicator } from "react-native";
 import { useAuth } from "../context/AuthProvider";
 import { Link } from "expo-router";
+import Toast from 'react-native-root-toast';
 
 export default function Login({ navigation }: { navigation: any }) {
-  const { login } = useAuth();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const { login, loading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    login(email, password);
+  const handleLogin = async () => {
+    try {
+      await login(email, password);
+      showToast("Login successful!");
+    } catch (error) {
+      showToast("Login failed. Invalid email or password.");
+    }
+  };
+
+  const showToast = (message: string) => {
+    let toast = Toast.show(message, {
+      duration: Toast.durations.LONG,
+    });
+
+    setTimeout(() => {
+      Toast.hide(toast);
+    }, 3000);
   };
 
   return (
@@ -28,11 +44,17 @@ export default function Login({ navigation }: { navigation: any }) {
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Text style={styles.linkText}>
-        Don't have an account?{" "}
-        <Link style={styles.link} href={"/signup"}>Sign up</Link>
-      </Text>
+      {loading ? (
+        <ActivityIndicator size="small" color="#0000ff" />
+      ) : (
+        <>
+          <Button title="Login" onPress={handleLogin} />
+          <Text style={styles.linkText}>
+            Don't have an account?{" "}
+            <Link style={styles.link} href={"/signup"}>Sign up</Link>
+          </Text>
+        </>
+      )}
     </View>
   );
 }
