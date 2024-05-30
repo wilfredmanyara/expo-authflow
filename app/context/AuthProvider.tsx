@@ -1,4 +1,3 @@
-// AuthProvider.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useSegments, useRouter } from "expo-router";
 
@@ -37,10 +36,33 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
     }
   }, [user, segments]);
 
-  const login = (email: string, password: string) => {
-    // Perform login logic, e.g., API call
-    // Assume successful login for demonstration
-    setUser({ name: "John Doe" });
+  const login = async (email: string, password: string) => {
+    const apiUrl = 'https://joint-invest-gq7dqxfxha-uw.a.run.app/api/user/login';
+    const applicationId = '0d1cf352-f195-4dc8-a628-c1b4332a7f31';
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          application_id: applicationId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const data = await response.json();
+      setUser({ name: data.name });
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   const signup = (email: string, password: string) => {
