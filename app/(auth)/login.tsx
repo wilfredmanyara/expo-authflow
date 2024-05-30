@@ -10,6 +10,12 @@ export default function Login({ navigation }: { navigation: any }) {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      // Display an error message if email or password is missing
+      showToast("Please enter both email and password.");
+      return;
+    }
+  
     try {
       await login(email, password);
       showToast("Login successful!");
@@ -17,7 +23,7 @@ export default function Login({ navigation }: { navigation: any }) {
       showToast("Login failed. Invalid email or password.");
     }
   };
-
+  
   const showToast = (message: string) => {
     let toast = Toast.show(message, {
       duration: Toast.durations.LONG,

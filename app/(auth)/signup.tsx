@@ -12,18 +12,30 @@ export default function Signup() {
   const [password, setPassword] = useState("");
 
   const handleSignup = async () => {
+    if (!name || !email || !password) {
+      // Display an error message if any of the required fields are missing
+      showToast("Please enter all required information.");
+      return;
+    }
+  
     try {
       await signup(name, email, password);
-      Toast.show("Signup successful!", {
-        duration: Toast.durations.LONG,
-      });
+      showToast("Signup successful!");
     } catch (error) {
-      Toast.show("Signup failed. Please try again.", {
-        duration: Toast.durations.LONG,
-      });
+      showToast("Signup failed. Please try again.");
     }
   };
 
+  const showToast = (message: string) => {
+    let toast = Toast.show(message, {
+      duration: Toast.durations.LONG,
+    });
+
+    setTimeout(() => {
+      Toast.hide(toast);
+    }, 3000);
+  };
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
@@ -107,3 +119,7 @@ const styles = StyleSheet.create({
     color: "blue",
   },
 });
+function showToast(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+
