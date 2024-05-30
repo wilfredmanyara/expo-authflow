@@ -60,12 +60,11 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
         }
 
         const data = await response.json();
-        console.log('Login Response:', data); // Log the response data
+        console.log('Login Response:', data); 
 
-        // Assuming the token is received in the response
         const token = data.token;
 
-        // Fetch user details using the token
+        
         const userUrl = 'https://joint-invest-gq7dqxfxha-uw.a.run.app/api/user/me';
         const userDetailsResponse = await fetch(userUrl, {
             method: 'GET',
@@ -79,9 +78,8 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
         }
 
         const userData = await userDetailsResponse.json();
-        console.log('User Details:', userData); // Log user details
-
-        // Set both name and email
+        console.log('User Details:', userData); 
+       
         setUser({ name: userData.name, email: userData.email });
     } catch (error) {
         console.error('Login error:', error);
