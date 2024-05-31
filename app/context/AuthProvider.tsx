@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useSegments, useRouter } from "expo-router";
+import Toast from "react-native-root-toast";
 
 type User = {
   name: string;
@@ -9,16 +10,16 @@ type User = {
 type AuthType = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => void;
-  signup: (name: string, email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthType>({
   user: null,
   loading: false,
-  login: () => {},
-  signup: () => {},
+  login: async () => {},
+  signup: async () => {},
   logout: () => {},
 });
 
@@ -38,16 +39,16 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
     } else if (user && inAuthGroup) {
       router.replace("/home");
     }
-  }, [user, segments]);
+  }, [user, segments, router]);
 
   const login = async (email: string, password: string) => {
-    const apiUrl =
-      "https://joint-invest-gq7dqxfxha-uw.a.run.app/api/user/login";
-    const applicationId = "0d1cf352-f195-4dc8-a628-c1b4332a7f31";
-
     setLoading(true);
 
     try {
+      const apiUrl =
+        "https://joint-invest-gq7dqxfxha-uw.a.run.app/api/user/login";
+      const applicationId = "0d1cf352-f195-4dc8-a628-c1b4332a7f31";
+
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -84,19 +85,23 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
       const userData = await userDetailsResponse.json();
       setUser({ name: userData.name, email: userData.email });
     } catch (error) {
-      console.error("Login error:", error);
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        showToast("An error occurred. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const signup = async (name: string, email: string, password: string) => {
-    const apiUrl = "https://joint-invest-gq7dqxfxha-uw.a.run.app/api/user";
-    const applicationId = "0d1cf352-f195-4dc8-a628-c1b4332a7f31";
-
     setLoading(true);
 
     try {
+      const apiUrl = "https://joint-invest-gq7dqxfxha-uw.a.run.app/api/user";
+      const applicationId = "0d1cf352-f195-4dc8-a628-c1b4332a7f31";
+
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -118,15 +123,24 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
       const data = await response.json();
       setUser({ name: data.name, email: data.email });
     } catch (error) {
-      console.error("Signup error:", error);
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        showToast("An error occurred. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
-    // Perform logout logic, e.g., clear session
     setUser(null);
+  };
+
+  const showToast = (message: string) => {
+    Toast.show(message, {
+      duration: Toast.durations.LONG,
+    });
   };
 
   const authContext: AuthType = {

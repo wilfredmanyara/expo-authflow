@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 import { AuthProvider } from "../app/context/AuthProvider";
-import { RootSiblingParent } from 'react-native-root-siblings';
+import { RootSiblingParent } from "react-native-root-siblings";
 
 export default function RootLayout() {
   return (

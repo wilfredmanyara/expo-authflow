@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useAuth } from "../context/AuthProvider";
 import { Link } from "expo-router";
 import Toast from "react-native-root-toast";
-
 
 export default function Signup() {
   const { signup, loading } = useAuth();
@@ -13,16 +19,15 @@ export default function Signup() {
 
   const handleSignup = async () => {
     if (!name || !email || !password) {
-      // Display an error message if any of the required fields are missing
-      showToast("Please enter all required information.");
+      showToast("Please fill in all fields.");
       return;
     }
-  
+
     try {
       await signup(name, email, password);
       showToast("Signup successful!");
-    } catch (error) {
-      showToast("Signup failed. Please try again.");
+    } catch (error: any) {
+      showToast(error.message || "Signup failed. An error occurred.");
     }
   };
 
@@ -35,7 +40,7 @@ export default function Signup() {
       Toast.hide(toast);
     }, 3000);
   };
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
@@ -62,16 +67,17 @@ export default function Signup() {
         <ActivityIndicator size="small" color="#0000ff" style={styles.loader} />
       ) : (
         <>
-        <Pressable style={styles.button} onPress={handleSignup}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </Pressable>
-        <Text style={styles.linkText}>
-        Already have an account?{" "}
-        <Link style={styles.link} href={"/login"}>Log in</Link>
-      </Text>
-      </>
+          <Pressable style={styles.button} onPress={handleSignup}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </Pressable>
+          <Text style={styles.linkText}>
+            Already have an account?{" "}
+            <Link style={styles.link} href={"/login"}>
+              Log in
+            </Link>
+          </Text>
+        </>
       )}
-      
     </View>
   );
 }
@@ -122,4 +128,3 @@ const styles = StyleSheet.create({
 function showToast(arg0: string) {
   throw new Error("Function not implemented.");
 }
-
